@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixing SiteGround Dynamic Cache Issues</title>
+</head>
+<body>
+    <header class="intro">
+        <div class="left">
+            <h1>Fixing SiteGround Dynamic Cache Issues</h1>
+            <p>That's what you get for not using WordPress…</p>
+        </div>
+        <div class="right">
+            <p>
+                <time datetime="2021-12-24T12:24:00+02:00" title="Friday, December 24, 2021, 12:24 EET">12 Jan 2022 </time>
+            </p>
+            <p>100 lines</p>
+        </div>
+    </header>
+    <img src="https://dodov.dev/media/pages/blog/fixing-siteground-dynamic-cache-issues/adf04a2e0b-1642745720/siteground-random-characters-cover-640x.png" alt="">
+    <main>
+        <p>If your website is hosted on SiteGround and you have strange issues, such as clicking on a button and nothing happening, it could be a cache issue. By default, SiteGround caches all requests, as they've said in <a href="https://www.siteground.com/kb/siteground-dynamic-caching-configuration/" target="_blank" rel="noopener noreferrer">their help center article</a>:</p>
+        <blockquote>
+            <p>Our Dynamic caching is a full-page caching mechanism powered by NGINX that's enabled and running by default on all SiteGround servers.</p>
+        </blockquote>
+        <p>The problem is that <strong>everything</strong> is cached, including the raw HTML of your pages and AJAX requests made by either your front-end, admin panel, or whatever. There also appears to be no way to simply turn off this functionality.</p>
+
+        <p>In my case, I'm using Kirby CMS and this aggressive caching means that if I change the status of a blog post from <em>Draft</em> to <em>Public</em>, it actually happens at a filesystem level, but since the HTML of the blog is cached, the article doesn't appear. Because AJAX requests are <em>also</em> cached, the Kirby panel front-end isn't updated as well, leaving no indication that something actually happened.</p>
+
+        <p>SiteGround has built-in exceptions for the cache. For example, if a visitor has the <code>wordpress_logged_in_</code> or <code>Drupal.visitor.name</code> cookie, they'll bypass the cache and see all changes they make immediately. However, if you're using something other than WordPress or Drupal, like me, you're screwed.</p>
+        
+        <p>Luckily, SiteGround respects <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control" target="_blank" rel="noopener noreferrer"><code>Cache-Control</code> headers</a> that your server sends. You can turn off the cache entirely by adding the following in your main <code>index.php</code> file:</p>
+
+        <div class="code">
+            <pre>
+                <code>
+                    header('Cache-Control: no-cache');
+                </code>
+            </pre>
+        </div>
+
+        <p>Alternatively, in case of using Kirby, you could disable it for just the panel by <a href="https://regex101.com/r/tM1OZT" target="_blank" rel="noopener noreferrer">matching the request path with regex</a>:</p>
+
+        <div class="code">
+            <pre>
+                <code>
+                    if (preg_match('~^/(panel|api)(/|\?|$)~', $_SERVER['REQUEST_URI'])) {
+                        header('Cache-Control: no-cache');
+                    }
+                </code>
+            </pre>
+        </div>
+
+        <p>You can check if this works by <a href="https://developer.chrome.com/docs/devtools/network/reference/#headers" target="_blank" rel="noopener noreferrer">inspecting the response headers</a> and looking for the <code>x-proxy-cache</code> header. It tells whether the response was served by the cache or not. If you see the following, the response was not cached:</p>
+
+        <pre>
+            <code>x-proxy: MISS</code>
+        </pre>
+
+        <h2>Handling Cloudflare Cache</h2>
+
+        <p>Things can be even more confusing if you use Cloudflare, due to <a href="https://developers.cloudflare.com/cache/about/default-cache-behavior" target="_blank" rel="noopener noreferrer">its own caching functionality</a>. It has to be enabled explicitly and only caches static files by default, so it has less unpleasant surprises. In my opinion, it doesn't make much sense to have both caches enabled, so you should probably disable one or the other. You can determine the Cloudflare cache status by looking at the <code>cf-cache-status</code> header.</p>
+
+        <p>The response is cached by Cloudflare if you have these headers:</p>
+
+        <pre>
+            <code>cf-cache-status: HIT x-proxy-cache: MISS</code>
+        </pre>
+
+        <p>…and you get these headers if it's cached by SiteGround instead:</p>
+
+        <pre>
+            <code>cf-cache-status: DYNAMIC x-proxy-cache: HIT</code>
+        </pre>
+
+        <hr class="seperate">
+    </main>
+
+    <footer>
+        <ul class="footer">
+            <li>
+                <a href="https://github.com/hdodov">GitHub</a>
+                <span>•</span>
+            </li>
+            <li>
+                <a href="https://twitter.com/yandodov">Twitter</a>
+                <span>•</span>
+            </li>
+            <li>
+                <a href="https://www.linkedin.com/in/yandodov/">LinkedIn</a>
+                <span>•</span>
+            </li>
+            <li><a href="https://www.instagram.com/yandodov/">Instagram</a></li>
+        </ul>
+        <div class="select">
+            <select name="" id="">
+                <option value="dark">Dark+</option>
+                <option value="dark">Light+</option>
+                <option value="dark">Monokai+</option>
+                <option value="dark">GitHub Dark</option>
+                <option value="dark">GitHub Light</option>
+                <option value="dark">Solarized Light</option>
+            </select>
+        </div>
+    </footer>
+</body>
+</html>

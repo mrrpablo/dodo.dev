@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browser Cache and Edge Cache Explained</title>
+</head>
+<body>
+    <header class="intro">
+        <div class="left">
+            <h1>Browser Cache and Edge Cache Explained</h1>
+            <p>You updated it? Well, yes, but not really. </p>
+        </div>
+        <div class="right">
+            <p>
+                <time datetime="2021-12-24T12:24:00+02:00" title="Friday, December 24, 2021, 12:24 EET">08 Feb 2022 </time>
+            </p>
+            <p>182 lines</p>
+        </div>
+    </header>
+    <img src="https://dodov.dev/media/pages/blog/browser-cache-and-edge-cache-explained/34977cd3c0-1644310227/browser-edge-cache-cover-640x.png" alt="">
+    <main>
+        <p>Does the following sound familiar?</p>
+
+        <blockquote>
+            "The new feature is live." <br>
+            "I can't see it." <br>
+            "Have you cleared your browser cache?" <br>
+            "Yes. It's still not visible." <br>
+            <strong>
+                <em>Hmmm…</em>
+            </strong>
+        </blockquote>
+
+        <p>This could happen when there are multiple layers of <a href="https://www.cloudflare.com/learning/cdn/what-is-caching/" target="_blank" rel="noopener noreferrer">caching</a> in play and one of them has not expired. If you've used something like <a href="https://www.cloudflare.com/cdn/" target="_blank" rel="noopener noreferrer">Cloudflare CDN</a>, you've likely ran into this.</p>
+
+        <h3>What is Browser Caching?</h3>
+
+        <p>Let's say your website has a logo in the header and it appears on all pages. When users land on your website and start browsing, they'll be downloading the <strong>same</strong> logo on <strong>every</strong> page load. This inefficiency increases bandwidth costs and load times.</p>
+
+        <p>When sending the logo to the user, your server can also provide the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control" target="_blank" rel="noopener noreferrer"><code>Cache-Control</code> response header</a> with an expiration value like <code>max-‍age=604800</code>. This will tell the browser to store the logo locally, on the user's hard drive, for 604800 seconds, which is 7 days. Until that time passes, whenever your website references the logo through the same URL, the user's browser will use its cached version. After that, the browser will request the logo from your server once again and cache it for another 7 days.</p>
+
+        <h3>What is an Edge?</h3>
+        <p>If your audience is mainly European, it would probably make sense to put your server in London, for example. But if your website starts receiving traffic from America, those requests would have to travel an entire ocean, which can make them several times slower, due to <a href="https://www.cloudflare.com/learning/performance/glossary/what-is-latency/" target="_blank" rel="noopener noreferrer">latency</a>. With a <a href="https://www.cloudflare.com/learning/cdn/what-is-a-cdn/" target="_blank" rel="noopener noreferrer">CDN</a>, you have a system of servers spread throughout the world that <a href="https://www.cloudflare.com/learning/cdn/glossary/reverse-proxy/" target="_blank" rel="noopener noreferrer">proxy</a> user traffic to your server and <a href="https://www.cloudflare.com/learning/cdn/performance/" target="_blank" rel="noopener noreferrer">solve this performance issue</a>.</p>
+
+        <p>Among the <a href="https://www.cloudflare.com/network/" target="_blank" rel="noopener noreferrer">hundreds of servers</a> in a CDN, the geographically closest one to a user is called an <em>edge</em> and is the one that this user's browser directly communicates with:</p>
+
+        <img src="https://dodov.dev/blog/browser-cache-and-edge-cache-explained" alt="">
+        <figcaption>Response flow from server to user over a CDN</figcaption>
+
+        <h3>What is Edge Caching?</h3>
+
+        <p>While browser caching helps with many requests by the same user, it doesn't solve the issue of many users making requests, because each user has their own browser with their own cache. To fix this, you need a shared cache.</p>
+
+        <p>With a CDN, all user requests are funneled through the closest edge server. If that server caches the responses, it'll be able to serve those users without having to bother your own server. This means that it no longer matters if you have 1 user or 10000, because once that first response for a resource is served and cached, the load shifts from your server to the CDN, which can serve the other 9999 by itself.</p>
+
+        <p>Cloudflare caches only static assets <a href="https://developers.cloudflare.com/cache/about/default-cache-behavior" target="_blank" rel="noopener noreferrer">by default</a>, such as images, fonts, scripts, etc. The HTML containing the page content is not cached, because if you have an e-commerce store, for example, each user will have their own shopping cart, and if you cache that, the next user will see the previous one's items. On the other hand, an image is expected to be the same for every user and can safely be cached.</p>
+
+        <p>Sites without shopping carts and other dynamic content, such as blogs, can opt in to <a href="https://developers.cloudflare.com/cache/how-to/create-page-rules#cache-everything" target="_blank" rel="noopener noreferrer">cache everything</a>. This makes it possible for an edge to serve entire pages all by itself, without having to contact your server, as long as everything is cached. This way, you can have a very weak server, yet handle thousands of requests per second, because the load is mainly on the CDN.</p>
+
+        <h3>Cache Invalidation</h3>
+
+        <p>The hard part in caching is picking a <a href="https://www.cloudflare.com/learning/cdn/glossary/time-to-live-ttl/" target="_blank" rel="noopener noreferrer">time to live (TTL)</a>, which determines when an entry is stale and should be discarded.</p>
+
+        <p>Images and other assets can be cached for longer periods, because even if you pick a way too long TTL, you can change the URL to the resource and trigger a fresh request-response cycle:</p>
+
+        <pre>
+            <code>https://example.com/about-us/image.jpg?version=2</code>
+        </pre>
+
+        <p>However, if you've chosen to cache the HTML content of your pages as well, you'd have to get around that too, since changing the image URL means changing the HTML. So you'd have to change the page URL as well:</p>
+
+        <pre>
+            <code>https://example.com/about-us?version=2</code>
+        </pre>
+
+        <p>This is where things get tricky, because even if your web framework can easily change all links to the updated page, <strong>every other site on the internet</strong> also has to do it. That's impossible, so you have to pick a window of time that you're comfortable with and in which users may see outdated content.</p>
+
+        <p>If you have the following setup:</p>
+
+        <ul>
+            <li>
+                <p>Browser cache TTL: <strong>30 minutes</strong></p>
+            </li>
+            <li>
+                <p>Edge cache TTL: <strong>1 minute</strong></p>
+            </li>
+        </ul>
+
+        <p>…there are several possible outcomes:</p>
+
+        <ol>
+            <li>
+                <p>If a change happened <strong>over 30 minutes ago</strong>, both caches would have expired and it's guaranteed that the user will see the updated version.</p>
+            </li>
+            <li>
+                <p>If a change happened <strong>over 1 minute ago</strong>, only the edge cache is guaranteed to have expired. If a user has seen the page within the last 30 minutes and is cached by their browser, they can see the change by clearing their browser cache, opening an incognito window, or doing a <a href="https://stackoverflow.com/questions/14969315/whats-the-difference-between-normal-reload-hard-reload-and-empty-cache-a" target="_blank" rel="noopener noreferrer">hard reload</a>.</p>
+            </li>
+            <li>
+                <p>If a change happened <strong>less than 1 minute ago</strong>, both caches would still be considered fresh. Users will not be able to see the update, <strong>even if they clear their browser cache</strong>, because the closest edge server would still return the old version. The only solution here is for the website owner to prematurely force the cache to become stale by <a href="https://developers.cloudflare.com/cache/how-to/purge-cache#purge-by-single-file-by-url" target="_blank" rel="noopener noreferrer">purging it</a>.</p>
+            </li>
+        </ol>
+
+        <h3>Conclusion</h3>
+
+        <p><strong>Browser cache</strong> helps with subsequent requests by the same user and makes your website feel snappy, because your assets don't have to travel over the internet.</p>
+
+        <p><strong>Edge cache</strong> helps with requests by a geographically close group of users and can greatly reduce server load while improving response times in distant countries.</p>
+
+        <p>Pick a lower TTL to reduce the chance of outdated content, or a higher TTL for better cache effectiveness, but be ready to change URLs, open incognito windows, and purge cache.</p>
+
+        <hr class="seperate">
+    </main>
+
+    <footer>
+        <ul class="footer">
+            <li>
+                <a href="https://github.com/hdodov">GitHub</a>
+                <span>•</span>
+            </li>
+            <li>
+                <a href="https://twitter.com/yandodov">Twitter</a>
+                <span>•</span>
+            </li>
+            <li>
+                <a href="https://www.linkedin.com/in/yandodov/">LinkedIn</a>
+                <span>•</span>
+            </li>
+            <li><a href="https://www.instagram.com/yandodov/">Instagram</a></li>
+        </ul>
+        <div class="select">
+            <select name="" id="">
+                <option value="dark">Dark+</option>
+                <option value="dark">Light+</option>
+                <option value="dark">Monokai+</option>
+                <option value="dark">GitHub Dark</option>
+                <option value="dark">GitHub Light</option>
+                <option value="dark">Solarized Light</option>
+            </select>
+        </div>
+    </footer>
+</body>
+</html>
