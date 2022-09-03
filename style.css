@@ -1,0 +1,59 @@
+:root,
+    :root.light{
+        --bg-color: #fff;
+        --text-color: #123;
+    }
+
+    :root.dark{
+        --bg-color: #121212;
+        --text-color: #696d7d;
+    }
+
+    :root.blue {
+        --bg-color: #05396B;
+        --text-color: #E7F1FE;
+        }
+     
+        :root.pink {
+        --bg-color: #ffcad4;
+        --text-color: #e75480;
+        }
+     
+        :root.space {
+        --bg-color: #000;
+        --text-color: #f2bd16;
+        --bg-url: url(//space);
+        --font-family: 'Press Start 2P', cursive;
+        }
+     
+        :root.nyan {
+        --bg-color: #013367;
+        --text-color: #fff;
+        --bg-url: url(//nyan);
+        --font-family: 'Comic Neue', cursive;
+        }
+
+        select{
+            padding: 0.5em 1em;
+            font-size: 1.25rem;
+            font-family: inherit;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            outline: none;
+            border: none;
+        }
+
+        body{
+            margin: 0 auto;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-family, "open sans", sans-serif);
+            padding: 0 100px;
+        }
+
+        @media (prefers-color-scheme: dark){
+            :root{
+                --bg-color:#121212;
+                --text-color: #45adfe;
+            }
+        }
