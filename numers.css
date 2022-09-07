@@ -225,12 +225,22 @@
   --color-quote: #859900;
 }
 
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
 body {
   margin: 0 auto;
   background-color: var(--color-bg);
   color: var(--color-body-text);
   font-family: "Fira Code", monospace;
   padding: 0 100px;
+  font-size: 1.1rem;
+}
+
+header{
   font-size: 1rem;
 }
 
@@ -244,17 +254,20 @@ select {
   border: none;
 }
 
-* {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
+.intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2em;
 }
 
-.intro{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2em;
+h3{
+  font-size: 1.8rem;
+  margin:  1.5em 0;
+}
+
+p{
+  margin: 1.2em 0;
 }
 
 .container {
@@ -263,10 +276,14 @@ select {
   max-width: 1200px;
   background-color: var(--color-editor);
   width: 65%;
-  min-height: 800vh;
-  /* display: flex; */
-  /* justify-content: center;
-    align-items: flex-start; */
+  min-height: 850vh;
+  display: flex;
+}
+
+.numbers{
+  display: flex;
+  flex-direction: column;
+  margin-right: 1.5em;
 }
 
 img {
@@ -278,29 +295,25 @@ pre {
   align-items: center;
   position: relative;
   left: 0;
-  border: 1px solid red;
+  background-color: var(--color-code-bg);
+  color: var(--color-secondary-text);
 }
 
 .code {
-  overflow-x: auto;
-  margin-left: -14em;
+  margin-left: -12em;
   line-height: 1;
-  border: 1px solid red;
   margin-top: 1em;
 }
 
-/* code{
-    margin-left: -11em;
-} */
-
 .ol {
   width: 5%;
-}
-
-ol {
-  padding: 0;
-  margin: 0;
-  line-height: 0.4;
+  background-color: var(--color-code-bg);
+  color: var(--color-secondary-text);
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin-right: 2em;
+  line-height: -.5;margin-top: 1em;
 }
 
 blockquote {
@@ -317,9 +330,9 @@ blockquote::before {
   color: var(--color-quote);
 }
 
-.seperator{
-    color: var(--color-comment);
-    margin: 1em 0;
+.seperator {
+  color: var(--color-comment);
+  margin: 1em 0;
 }
 
 .wrapper {
@@ -327,18 +340,21 @@ blockquote::before {
   color: var(--color-quote);
 }
 
+.wrapper p{
+  margin: 0;
+}
+
 .seperator::before {
   content: "// ";
-  /* margin-left: .5em; */
 }
 
 .seperator::after {
-  content: "  -----------------------------------------------------------------";
+  content: "  ---------------------------------------------------------";
   overflow-wrap: anywhere;
 }
 
 footer {
-  margin-left: 2.5em;
+  /* margin-left: 1.5em; */
 }
 
 .foot {
@@ -358,51 +374,139 @@ ul.footer li {
 }
 
 ul.footer li span {
-  margin-left: 1em;
-  font-size: 25px;
-  align-self: center;
+  font-size: 15px;
+  margin-top: 2em;
 }
 
-ul.footer li a{
-    color: var(--color-accent-1);
+ul.footer li a {
+  color: var(--color-accent-1);
 }
 
 ul.footer li a:focus,
-ul.footer li a:hover{
-    color: var(--color-focus);
+ul.footer li a:hover {
+  color: var(--color-focus);
 }
 
-a{
-    color: var(--color-accent-1);
+a {
+  color: var(--color-accent-1);
 }
 
 a::hover,
-a::focus{
-    color: var(--color-focus);
+a::focus {
+  color: var(--color-focus);
 }
 
-pre{
-    background-color: var(--color-code-bg);
-    color: var(--color-secondary-text);
+pre .six {
+  color: var(--color-code-constant);
 }
 
-.six{
-    color: var(--color-code-constant);
+.for {
+  color: var(--color-code-function);
 }
 
-.for{
-    color: var(--color-code-function);
-}
-
-.equal{
-    color: var(--color-code-function);
+.equal {
+  color: var(--color-code-function);
 }
 
 .col,
-.percent{
-    color: var(--color-code-text-inline);
+.percent {
+  color: var(--color-code-text-inline);
 }
 
-.comment{
-    color: var(--color-code-comment);
+.comment {
+  color: var(--color-code-comment);
+}
+
+.row{
+  margin-left: -10em;
+}
+
+@media screen and (max-width: 768px) {
+  body{
+    padding: 0;
+    margin: 0;
+    /* font-size: 1rem; */
+  }
+  .container{
+    width: 100%;
+    margin: 0 auto;
+    padding: 3em 35px;
+  }
+
+}
+
+@media screen and (max-width: 599px)  {
+  .container{
+    width: 100%;
+  }
+
+  .content{
+    width: 80%;
+  }
+
+  pre{
+    overflow-x: auto;
+  }
+  .intro{
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .foot{
+    flex-direction: column;
+    margin-left: -20em;
+  }
+
+  select{
+    margin-left: 4.5em;
+    margin-top: 1em;
+  }
+  ul.footer{
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .seperator::after{
+    content: "- - - - - - - - - - - - - - - - - - - ";
+  }
+
+  ul.footer span{
+    display: none;
+  }
+
+  img{
+    width: 80%;
+  }
+}
+
+@media screen and (max-width: 476px){
+  .foot{
+    margin-left: -14em;
+  }
+
+  blockquote::before{
+    content: "> > > > > > ";
+  }
+
+  .seperator::after{
+    content: "- - - - - - - - - - - - - - ";
+  }
+}
+
+@media screen and (max-width: 425px) {
+  .foot{
+    margin-left: -12em;
+  }
+
+  .content{
+    width: 90%;
+  }
+
+  .seperator::after{
+    content: "- - - - - - - - - -";
+  }
+
+  blockquote::before{
+    content: "> > > > > >";
+  }
 }

@@ -1,0 +1,15 @@
+.container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.numbers span{
+    display: flex;
+    flex-direction: column;
+    width: 5%;
+}
+
+.content{
+    margin-left: -90em;
+}
