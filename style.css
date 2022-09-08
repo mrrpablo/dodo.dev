@@ -364,7 +364,7 @@
 
         @media screen and (max-width: 768px) {
             .container{
-                width: 90%;
+                width: 83%;
                 margin: 0 auto;
                 padding: 0 35px;
             }
@@ -415,7 +415,7 @@
             }
 
             .seperator::after{
-                content: "-  - - - - - - - - - - - - - - - - - - -  - - - ";
+                content: "  - - - - - - - - - - - - - - -  - - - ";
             }
 
             header{
